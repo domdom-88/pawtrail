@@ -20,6 +20,13 @@
                 </div>
             @endif
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<div class="bg-white p-6 shadow sm:rounded-lg">
+    <h3 class="text-lg font-medium mb-4">Map</h3>
+    <div id="map" style="height: 400px; border-radius: 0.5rem;"></div>
+</div>
+
             <div class="bg-white p-6 shadow sm:rounded-lg">
                 <h3 class="text-lg font-medium mb-4">Add a spot</h3>
 
@@ -73,3 +80,37 @@
         </div>
     </div>
 </x-app-layout>
+
+@php
+    $spotPins = $spots->map(fn ($spot) => [
+        'name' => $spot->name,
+        'description' => $spot->description,
+        'lat' => (float) $spot->latitude,
+        'lng' => (float) $spot->longitude,
+    ]);
+@endphp
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    const map = L.map('map').setView([53.4808, -3.0093], 10);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 19,
+    }).addTo(map);
+
+    const spots = @json($spotPins);
+
+    const markers = [];
+
+    spots.forEach(spot => {
+        const marker = L.marker([spot.lat, spot.lng]).addTo(map);
+        marker.bindPopup(`<strong>${spot.name}</strong>${spot.description ? '<br>' + spot.description : ''}`);
+        markers.push(marker);
+    });
+
+    if (markers.length > 0) {
+        const group = new L.featureGroup(markers);
+        map.fitBounds(group.getBounds().pad(0.2));
+    }
+</script>

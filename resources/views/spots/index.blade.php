@@ -46,17 +46,28 @@
             <div class="bg-white p-6 shadow sm:rounded-lg">
                 <h3 class="text-lg font-medium mb-4">All spots</h3>
 
-                @forelse ($spots as $spot)
-                    <div class="border-b py-3">
+            @forelse ($spots as $spot)
+                <div class="border-b py-3 flex justify-between items-start">
+                    <div>
                         <p class="font-semibold">{{ $spot->name }}</p>
                         <p class="text-sm text-gray-600">{{ $spot->latitude }}, {{ $spot->longitude }}</p>
                         @if($spot->description)
                             <p class="text-sm text-gray-600 mt-1">{{ $spot->description }}</p>
                         @endif
                     </div>
-                @empty
-                    <p class="text-gray-500">No spots yet — add one above.</p>
-                @endforelse
+
+                    <div class="flex gap-3 text-sm">
+                        <a href="{{ route('spots.edit', $spot) }}" class="text-indigo-600">Edit</a>
+                        <form method="POST" action="{{ route('spots.destroy', $spot) }}" onsubmit="return confirm('Remove {{ $spot->name }}?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-600">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            @empty
+                <p class="text-gray-500">No spots yet — add one above.</p>
+            @endforelse
             </div>
 
         </div>

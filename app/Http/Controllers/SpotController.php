@@ -78,7 +78,11 @@ class SpotController extends Controller
      */
     public function edit(Spot $spot)
     {
-        //
+        if ($spot->created_by !== auth()->id()) {
+            abort(403);
+        }
+
+        return view('spots.edit', compact('spot'));
     }
 
     /**
@@ -86,7 +90,18 @@ class SpotController extends Controller
      */
     public function update(Request $request, Spot $spot)
     {
-        //
+        if ($spot->created_by !== auth()->id()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        $spot->update($validated);
+
+        return redirect()->route('spots.index')->with('success', 'Spot updated!');
     }
 
     /**
@@ -94,6 +109,12 @@ class SpotController extends Controller
      */
     public function destroy(Spot $spot)
     {
-        //
+        if ($spot->created_by !== auth()->id()) {
+            abort(403);
+        }
+
+        $spot->delete();
+
+        return redirect()->route('spots.index')->with('success', 'Spot removed.');
     }
 }

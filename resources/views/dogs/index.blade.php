@@ -55,8 +55,9 @@
             <div class="bg-white p-6 shadow sm:rounded-lg">
                 <h3 class="text-lg font-medium mb-4">Your dogs</h3>
 
-                @forelse ($dogs as $dog)
-                    <div class="border-b py-3">
+            @forelse ($dogs as $dog)
+                <div class="border-b py-3 flex justify-between items-start">
+                    <div>
                         <p class="font-semibold">{{ $dog->name }} @if($dog->breed) ({{ $dog->breed }}) @endif</p>
                         @if($dog->age)
                             <p class="text-sm text-gray-600">Age: {{ $dog->age }}</p>
@@ -68,9 +69,19 @@
                             <p class="text-sm text-gray-600 mt-1">{{ $dog->description }}</p>
                         @endif
                     </div>
-                @empty
-                    <p class="text-gray-500">No dogs yet — add one above.</p>
-                @endforelse
+
+                    <div class="flex gap-3 text-sm">
+                        <a href="{{ route('dogs.edit', $dog) }}" class="text-indigo-600">Edit</a>
+                        <form method="POST" action="{{ route('dogs.destroy', $dog) }}" onsubmit="return confirm('Remove {{ $dog->name }}?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-600">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            @empty
+                <p class="text-gray-500">No dogs yet — add one above.</p>
+            @endforelse
             </div>
 
         </div>

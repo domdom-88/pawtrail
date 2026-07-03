@@ -58,7 +58,11 @@ public function store(Request $request)
      */
     public function edit(Dog $dog)
     {
-        //
+    if ($dog->user_id !== auth()->id()) {
+        abort(403);
+    }
+
+    return view('dogs.edit', compact('dog'));
     }
 
     /**
@@ -66,7 +70,21 @@ public function store(Request $request)
      */
     public function update(Request $request, Dog $dog)
     {
-        //
+        if ($dog->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'breed' => 'nullable|string|max:255',
+            'age' => 'nullable|integer|min:0|max:30',
+            'favourite_food' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        $dog->update($validated);
+
+        return redirect()->route('dogs.index')->with('success', 'Dog updated!');
     }
 
     /**
@@ -74,6 +92,12 @@ public function store(Request $request)
      */
     public function destroy(Dog $dog)
     {
-        //
+        if ($dog->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $dog->delete();
+
+        return redirect()->route('dogs.index')->with('success', 'Dog removed.');
     }
 }

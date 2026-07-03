@@ -33,6 +33,11 @@ class User extends Authenticatable
 {
     return $this->hasMany(Dog::class);
 }
+
+public function spots()
+{
+    return $this->hasMany(Spot::class, 'created_by');
+}
 }
 
 

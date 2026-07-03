@@ -1,0 +1,64 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            Spots
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-2xl mx-auto sm:px-6 lg:px-8 space-y-6">
+
+            @if (session('success'))
+                <div class="bg-green-100 text-green-800 px-4 py-3 rounded">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="bg-red-100 text-red-800 px-4 py-3 rounded">
+                    {{ session('error') }}
+                </div>
+            @endif
+
+            <div class="bg-white p-6 shadow sm:rounded-lg">
+                <h3 class="text-lg font-medium mb-4">Add a spot</h3>
+
+                <form method="POST" action="{{ route('spots.store') }}" class="space-y-4">
+                    @csrf
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Place name</label>
+                        <input type="text" name="place_name" value="{{ old('place_name') }}" class="mt-1 block w-full rounded-md border-gray-300" placeholder="e.g. Formby Beach">
+                        @error('place_name') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Description</label>
+                        <textarea name="description" rows="3" class="mt-1 block w-full rounded-md border-gray-300">{{ old('description') }}</textarea>
+                    </div>
+
+                    <button type="submit" class="bg-gray-800 text-white px-4 py-2 rounded-md">
+                        Find and save
+                    </button>
+                </form>
+            </div>
+
+            <div class="bg-white p-6 shadow sm:rounded-lg">
+                <h3 class="text-lg font-medium mb-4">All spots</h3>
+
+                @forelse ($spots as $spot)
+                    <div class="border-b py-3">
+                        <p class="font-semibold">{{ $spot->name }}</p>
+                        <p class="text-sm text-gray-600">{{ $spot->latitude }}, {{ $spot->longitude }}</p>
+                        @if($spot->description)
+                            <p class="text-sm text-gray-600 mt-1">{{ $spot->description }}</p>
+                        @endif
+                    </div>
+                @empty
+                    <p class="text-gray-500">No spots yet — add one above.</p>
+                @endforelse
+            </div>
+
+        </div>
+    </div>
+</x-app-layout>

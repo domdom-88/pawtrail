@@ -11,12 +11,31 @@ class SpotController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $spots = Spot::latest()->get();
+public function index()
+{
+    $spots = Spot::withCount('pawedByUsers')
+        ->with(['pawedByUsers' => fn ($query) => $query->where('user_id', auth()->id())])
+        ->latest()
+        ->get();
 
-        return view('spots.index', compact('spots'));
+    return view('spots.index', compact('spots'));
+}
+    /**
+     * Toggle the authenticated user's paw on a spot.
+     */
+ public function togglePaw(Request $request, Spot $spot)
+{
+    $result = $spot->pawedByUsers()->toggle(auth()->id());
+
+    if ($request->wantsJson()) {
+        return response()->json([
+            'pawed' => count($result['attached']) > 0,
+            'count' => $spot->pawedByUsers()->count(),
+        ]);
     }
+
+    return back();
+}
 
     /**
      * Show the form for creating a new resource.

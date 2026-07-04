@@ -25,6 +25,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('dogs', DogController::class);
     Route::resource('spots', SpotController::class)->only(['index', 'show']);
+    Route::post('/spots/{spot}/paw', [SpotController::class, 'togglePaw'])->name('spots.paw');
 });
 
 require __DIR__.'/auth.php';

@@ -63,6 +63,17 @@
                         @if($spot->description)
                             <p class="text-sm text-gray-600 mt-1">{{ $spot->description }}</p>
                         @endif
+
+                        <p class="text-sm text-gray-600 mt-1" id="paw-count-{{ $spot->id }}">
+                            {{ $spot->pawed_by_users_count }} paw{{ $spot->pawed_by_users_count === 1 ? '' : 's' }}
+                        </p>
+
+                        <form method="POST" action="{{ route('spots.paw', $spot) }}" class="paw-form" data-spot-id="{{ $spot->id }}">
+                            @csrf
+                            <button type="submit" id="paw-button-{{ $spot->id }}" class="text-sm {{ $spot->pawedByUsers->isNotEmpty() ? 'text-amber-600 font-semibold' : 'text-gray-400' }}">
+                                🐾 {{ $spot->pawedByUsers->isNotEmpty() ? 'Pawed' : 'Paw' }}
+                            </button>
+                        </form>
                     </div>
                 @if(auth()->user()->is_admin)
                     <div class="flex gap-3 text-sm">
@@ -116,4 +127,33 @@
         const group = new L.featureGroup(markers);
         map.fitBounds(group.getBounds().pad(0.2));
     }
+</script>
+
+<script>
+    document.querySelectorAll('.paw-form').forEach(form => {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const response = await fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
+                },
+            });
+
+            const data = await response.json();
+
+            const spotId = form.dataset.spotId;
+            const button = document.getElementById(`paw-button-${spotId}`);
+            const countEl = document.getElementById(`paw-count-${spotId}`);
+
+            button.textContent = data.pawed ? '🐾 Pawed' : '🐾 Paw';
+            button.classList.toggle('text-amber-600', data.pawed);
+            button.classList.toggle('font-semibold', data.pawed);
+            button.classList.toggle('text-gray-400', !data.pawed);
+
+            countEl.textContent = `${data.count} paw${data.count === 1 ? '' : 's'}`;
+        });
+    });
 </script>

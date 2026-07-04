@@ -38,6 +38,11 @@ public function spots()
 {
     return $this->hasMany(Spot::class, 'created_by');
 }
+
+public function pawedSpots()
+{
+    return $this->belongsToMany(Spot::class)->withTimestamps();
+}
 }
 
 

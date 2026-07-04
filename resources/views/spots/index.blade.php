@@ -27,28 +27,30 @@
     <div id="map" style="height: 400px; border-radius: 0.5rem;"></div>
 </div>
 
-            <div class="bg-white p-6 shadow sm:rounded-lg">
-                <h3 class="text-lg font-medium mb-4">Add a spot</h3>
+@if(auth()->user()->is_admin)
+    <div class="bg-white p-6 shadow sm:rounded-lg">
+        <h3 class="text-lg font-medium mb-4">Add a spot</h3>
 
-                <form method="POST" action="{{ route('spots.store') }}" class="space-y-4">
-                    @csrf
+        <form method="POST" action="{{ route('spots.store') }}" class="space-y-4">
+            @csrf
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Place name</label>
-                        <input type="text" name="place_name" value="{{ old('place_name') }}" class="mt-1 block w-full rounded-md border-gray-300" placeholder="e.g. Formby Beach">
-                        @error('place_name') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Description</label>
-                        <textarea name="description" rows="3" class="mt-1 block w-full rounded-md border-gray-300">{{ old('description') }}</textarea>
-                    </div>
-
-                    <button type="submit" class="bg-gray-800 text-white px-4 py-2 rounded-md">
-                        Find and save
-                    </button>
-                </form>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Place name</label>
+                <input type="text" name="place_name" value="{{ old('place_name') }}" class="mt-1 block w-full rounded-md border-gray-300" placeholder="e.g. Formby Beach">
+                @error('place_name') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
             </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Description</label>
+                <textarea name="description" rows="3" class="mt-1 block w-full rounded-md border-gray-300">{{ old('description') }}</textarea>
+            </div>
+
+            <button type="submit" class="bg-gray-800 text-white px-4 py-2 rounded-md">
+                Find and save
+            </button>
+        </form>
+    </div>
+@endif
 
             <div class="bg-white p-6 shadow sm:rounded-lg">
                 <h3 class="text-lg font-medium mb-4">All spots</h3>
@@ -62,7 +64,7 @@
                             <p class="text-sm text-gray-600 mt-1">{{ $spot->description }}</p>
                         @endif
                     </div>
-
+                @if(auth()->user()->is_admin)
                     <div class="flex gap-3 text-sm">
                         <a href="{{ route('spots.edit', $spot) }}" class="text-indigo-600">Edit</a>
                         <form method="POST" action="{{ route('spots.destroy', $spot) }}" onsubmit="return confirm('Remove {{ $spot->name }}?');">
@@ -71,6 +73,7 @@
                             <button type="submit" class="text-red-600">Delete</button>
                         </form>
                     </div>
+                @endif
                 </div>
             @empty
                 <p class="text-gray-500">No spots yet — add one above.</p>

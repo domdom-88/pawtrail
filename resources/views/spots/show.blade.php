@@ -79,22 +79,45 @@
             <div class="bg-white p-6 shadow sm:rounded-lg">
                 <h3 class="text-lg font-medium mb-4">Visits</h3>
 
-                @forelse ($spot->visits as $visit)
-                    <div class="border-b py-3">
-<p class="font-semibold">
-    {{ $visit->dog->name }}
-    @if($visit->dog->breed)
-        ({{ $visit->dog->breed }})
-    @endif
-    <span class="text-gray-500 font-normal">— logged by {{ $visit->user->name }}</span>
-</p>                        <p class="text-sm text-gray-600">{{ $visit->visited_at->format('jS F Y') }}</p>
-                        @if($visit->notes)
-                            <p class="text-sm text-gray-700 mt-1">{{ $visit->notes }}</p>
-                        @endif
-                    </div>
-                @empty
-                    <p class="text-gray-500">No visits logged here yet — be the first!</p>
-                @endforelse
+@forelse ($spot->visits as $visit)
+    <div class="border-b py-3">
+        <p class="font-semibold">
+            {{ $visit->dog->name }}
+            @if($visit->dog->breed)
+                ({{ $visit->dog->breed }})
+            @endif
+            <span class="text-gray-500 font-normal">— logged by {{ $visit->user->name }}</span>
+        </p>
+        <p class="text-sm text-gray-600">{{ $visit->visited_at->format('jS F Y') }}</p>
+        @if($visit->notes)
+            <p class="text-sm text-gray-700 mt-1">{{ $visit->notes }}</p>
+        @endif
+
+        <div class="mt-3 pl-4 border-l-2 border-gray-100 space-y-2">
+            @foreach($visit->comments as $comment)
+                <div class="text-sm">
+                    <span class="font-medium">{{ $comment->user->name }}:</span>
+                    {{ $comment->body }}
+                    @if($comment->user_id === auth()->id())
+                        <form method="POST" action="{{ route('comments.destroy', $comment) }}" class="inline" onsubmit="return confirm('Delete this comment?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-500 text-xs ml-1">remove</button>
+                        </form>
+                    @endif
+                </div>
+            @endforeach
+
+            <form method="POST" action="{{ route('comments.store', $visit) }}" class="flex gap-2 mt-2">
+                @csrf
+                <input type="text" name="body" placeholder="Add a comment..." class="flex-1 text-sm rounded-md border-gray-300">
+                <button type="submit" class="text-sm text-indigo-600">Post</button>
+            </form>
+        </div>
+    </div>
+@empty
+    <p class="text-gray-500">No visits logged here yet — be the first!</p>
+@endforelse
             </div>
 
             <a href="{{ route('spots.index') }}" class="text-sm text-gray-600">&larr; Back to all spots</a>

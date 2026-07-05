@@ -27,25 +27,34 @@ class VisitController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-public function store(Request $request, Spot $spot)
-{
-    $validated = $request->validate([
-        'dog_id' => 'required|exists:dogs,id',
-        'notes' => 'nullable|string',
-    ]);
+    public function store(Request $request, Spot $spot)
+    {
+        $validated = $request->validate([
+            'dog_id' => 'required|exists:dogs,id',
+            'notes' => 'nullable|string',
+            'photos.*' => 'nullable|image|max:5120',
+        ]);
 
-    $dog = auth()->user()->dogs()->findOrFail($validated['dog_id']);
+        $dog = auth()->user()->dogs()->findOrFail($validated['dog_id']);
 
-    Visit::create([
-        'spot_id' => $spot->id,
-        'dog_id' => $dog->id,
-        'user_id' => auth()->id(),
-        'notes' => $validated['notes'] ?? null,
-        'visited_at' => now(),
-    ]);
+        $visit = Visit::create([
+            'spot_id' => $spot->id,
+            'dog_id' => $dog->id,
+            'user_id' => auth()->id(),
+            'notes' => $validated['notes'] ?? null,
+            'visited_at' => now(),
+        ]);
 
-    return back()->with('success', 'Visit logged!');
-}
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $photo) {
+                $path = $photo->store('visit-photos', 'public');
+
+                $visit->images()->create(['path' => $path]);
+            }
+        }
+
+        return back()->with('success', 'Visit logged!');
+    }
 
     /**
      * Display the specified resource.

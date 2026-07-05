@@ -52,8 +52,7 @@
                 @if(auth()->user()->dogs->isEmpty())
                     <p class="text-gray-500">You need to <a href="{{ route('dogs.index') }}" class="text-indigo-600">add a dog</a> before logging a visit.</p>
                 @else
-                    <form method="POST" action="{{ route('visits.store', $spot) }}" class="space-y-4">
-                        @csrf
+                        <form method="POST" action="{{ route('visits.store', $spot) }}" enctype="multipart/form-data" class="space-y-4">                        @csrf
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Dog</label>
@@ -63,7 +62,11 @@
                                 @endforeach
                             </select>
                         </div>
-
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Photos (optional)</label>
+                            <input type="file" name="photos[]" multiple accept="image/*" class="mt-1 block w-full text-sm">
+                            @error('photos.*') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
+                        </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Notes</label>
                             <textarea name="notes" rows="3" class="mt-1 block w-full rounded-md border-gray-300" placeholder="How was the walk?"></textarea>
@@ -92,7 +95,13 @@
         @if($visit->notes)
             <p class="text-sm text-gray-700 mt-1">{{ $visit->notes }}</p>
         @endif
-
+@if($visit->images->isNotEmpty())
+    <div class="flex gap-2 mt-2 flex-wrap">
+        @foreach($visit->images as $image)
+            <img src="{{ $image->url }}" class="w-24 h-24 object-cover rounded">
+        @endforeach
+    </div>
+@endif
         <div class="mt-3 pl-4 border-l-2 border-gray-100 space-y-2">
             @foreach($visit->comments as $comment)
                 <div class="text-sm">

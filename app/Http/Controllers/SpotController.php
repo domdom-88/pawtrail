@@ -91,7 +91,7 @@ public function index()
     {
         $spot->loadCount('pawedByUsers');
         $spot->load(['pawedByUsers' => fn ($query) => $query->where('user_id', auth()->id())]);
-        $spot->load(['visits' => fn ($query) => $query->with(['dog', 'user', 'comments.user'])->latest('visited_at')]);
+        $spot->load(['visits' => fn ($query) => $query->with(['dog', 'user', 'comments.user', 'images'])->latest('visited_at')]);
 
         return view('spots.show', compact('spot'));
     }

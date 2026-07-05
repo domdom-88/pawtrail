@@ -89,7 +89,11 @@ public function index()
      */
     public function show(Spot $spot)
     {
-        //
+        $spot->loadCount('pawedByUsers');
+        $spot->load(['pawedByUsers' => fn ($query) => $query->where('user_id', auth()->id())]);
+        $spot->load(['visits' => fn ($query) => $query->with(['dog', 'user'])->latest('visited_at')]);
+
+        return view('spots.show', compact('spot'));
     }
 
     /**
@@ -136,4 +140,6 @@ public function index()
 
         return redirect()->route('spots.index')->with('success', 'Spot removed.');
     }
+
+
 }

@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DogController;
 use App\Http\Controllers\SpotController;
+use App\Http\Controllers\VisitController;
 
 
 
@@ -26,6 +27,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('dogs', DogController::class);
     Route::resource('spots', SpotController::class)->only(['index', 'show']);
     Route::post('/spots/{spot}/paw', [SpotController::class, 'togglePaw'])->name('spots.paw');
+    Route::post('/spots/{spot}/visits', [VisitController::class, 'store'])->name('visits.store');
 });
 
 require __DIR__.'/auth.php';

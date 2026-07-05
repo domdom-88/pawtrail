@@ -97,6 +97,7 @@
 
 @php
     $spotPins = $spots->map(fn ($spot) => [
+        'slug' => $spot->slug,
         'name' => $spot->name,
         'description' => $spot->description,
         'lat' => (float) $spot->latitude,
@@ -119,8 +120,7 @@
 
     spots.forEach(spot => {
         const marker = L.marker([spot.lat, spot.lng]).addTo(map);
-        marker.bindPopup(`<strong>${spot.name}</strong>${spot.description ? '<br>' + spot.description : ''}`);
-        markers.push(marker);
+        marker.bindPopup(`<strong>${spot.name}</strong>${spot.description ? '<br>' + spot.description : ''}<br><a href="/spots/${spot.slug}">View details</a>`);        markers.push(marker);
     });
 
     if (markers.length > 0) {

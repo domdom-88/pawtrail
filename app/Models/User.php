@@ -43,6 +43,11 @@ public function pawedSpots()
 {
     return $this->belongsToMany(Spot::class)->withTimestamps();
 }
+
+public function visits()
+{
+    return $this->hasMany(Visit::class);
+}
 }
 
 
